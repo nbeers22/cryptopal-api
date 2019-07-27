@@ -75,14 +75,16 @@ coinsRouter
   });
 
 coinsRouter
-  .route('/:coin_symbol/history')
+  .route('/:coin_slug/history/:days')
   .get( (req,res,next) => {
-    const symbol = req.params.coin_symbol;
+    const slug = req.params.coin_slug;
+    const {days} = req.params
     const requestOptions = {
       method: 'GET',
-      uri: `https://min-api.cryptocompare.com/data/histoday?fsym=${symbol}&tsym=USD&limit=30`,
+      uri: `https://api.coingecko.com/api/v3/coins/${slug}/market_chart`,
       qs: {
-        'id': coinID
+        'vs_currency': 'usd',
+        'days': days || 30
       },
       headers: {
         'Apikey': '0ae8b16fe3fc03c68ed8452fd65370405e9600cd423f48749fef152f46655816'
