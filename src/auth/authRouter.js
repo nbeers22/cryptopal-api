@@ -1,82 +1,59 @@
 const express = require('express');
 
-const authRouter = express.Router()
-const jsonParser = express.json()
+const authRouter = express.Router();
+const jsonParser = express.json();
+const path = require('path');
+
+const AuthService = require('./authService.js')
 
 authRouter
   .post( '/login', jsonParser, (req, res, next) => {
-    
+    const { email, password } = req.body;
+    const user = { email, password };
+    // FINISH THIS PART
   });
 
 authRouter
-  .route('/:coin_id')
-  .get( (req,res,next) => {
-    const coinID = req.params.coin_id;
-    const requestOptions = {
-      method: 'GET',
-      uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/info',
-      qs: {
-        'id': coinID
-      },
-      headers: {
-        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
-      },
-      json: true,
-      gzip: true
-    };
+  .post( '/signup', jsonParser, (req, res, next) => {
+    const { name, email, password } = req.body;
+    const newUser = { name, email, password };
 
-    rp(requestOptions).then(response => {
-      res.json(response)
-    })
-    .catch(next);
-  });
+    for(const field of ['name', 'email', 'password']){
+      if(!req.body[field]){
+        res.status(400).json({
+          error: `Missing ${field} in request body`
+        });
+      }
+    }
 
-authRouter
-  .route('/:coin_id/market')
-  .get( (req,res,next) => {
-    const coinID = req.params.coin_id;
-    const requestOptions = {
-      method: 'GET',
-      uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest',
-      qs: {
-        'id': coinID
-      },
-      headers: {
-        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
-      },
-      json: true,
-      gzip: true
-    };
+    const passwordError = AuthService.validatePassword(password);
 
-    rp(requestOptions).then(response => {
-      res.json(response)
-    })
-    .catch(next);
-  });
+    if(passwordError){
+      return res.status(400).json({ error: passwordError });
+    }
 
-authRouter
-  .route('/:coin_slug/history/:days')
-  .get( (req,res,next) => {
-    const slug = req.params.coin_slug;
-    const {days} = req.params
-    const requestOptions = {
-      method: 'GET',
-      uri: `https://api.coingecko.com/api/v3/coins/${slug}/market_chart`,
-      qs: {
-        'vs_currency': 'usd',
-        'days': days || 30
-      },
-      headers: {
-        'Apikey': '0ae8b16fe3fc03c68ed8452fd65370405e9600cd423f48749fef152f46655816'
-      },
-      json: true,
-      gzip: true
-    };
-
-    rp(requestOptions).then(response => {
-      res.json(response)
-    })
-    .catch(next);
+    AuthService.checkEmailUnique(req.app.get('db'),email)
+      .then( response => {
+        if(response){
+          return res.status(400).json({ error: `Email already taken` })
+        }
+        AuthService.hashPassword(password)
+          .then( hashedPassword => {
+            const newUser = {
+              name,
+              email,
+              password: hashedPassword
+            }
+          })
+        return AuthService.insertUser(req.app.get('db'),newUser)
+          .then( user => {
+            res.
+              status(201)
+              .location(path.posix.join(req.originalUrl, `/${user.id}`))
+              .json(AuthService.serializeUser(user))
+          })
+      })
+      .catch(next)
   });
 
   module.exports = authRouter;
