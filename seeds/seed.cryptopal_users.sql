@@ -1,3 +1,3 @@
-INSERT INTO cryptopal_users (user_name, name, password,favorites)
+INSERT INTO cryptopal_users (email, name, password,favorites)
 VALUES
-  ('nbeers22', 'Nate Beers', 'password', '{1,1027}');
+  ('nbeers22@gmail.com', 'Nate Beers', 'password', '{1,1027}');
