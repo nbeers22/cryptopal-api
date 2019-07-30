@@ -38,7 +38,9 @@ authRouter
             const subject = user.email;
             const payload = { user_id: user.id }
             res.send({
-              authToken: AuthService.createJwt(subject,payload)
+              authToken: AuthService.createJwt(subject,payload),
+              user_id: user.id,
+              name: user.name
             })
           })
       })
