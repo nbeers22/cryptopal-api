@@ -1,5 +1,7 @@
 const xss = require('xss');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../config.js');
 
 const AuthService = {
   validatePassword(password){
@@ -9,6 +11,15 @@ const AuthService = {
   },
   hashPassword(password){
     return bcrypt.hash(password,12);
+  },
+  comparePasswords(password,hash){
+    return bcrypt.compare(password,hash);
+  },
+  createJwt(subject, payload) {
+    return jwt.sign(payload, config.JWT_SECRET, {
+      subject,
+      algorithm: 'HS256',
+    })
   },
   checkEmailUnique(db,email){
     return db('cryptopal_users')
@@ -30,7 +41,12 @@ const AuthService = {
       email: xss(user.email),
       date_created: new Date(user.date_created),
     }
-  }
+  },
+  getUserByEmail(db,email){
+    return db('cryptopal_users')
+      .where({ email })
+      .first()
+  },
 }
 
 module.exports = AuthService;

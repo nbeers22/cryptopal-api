@@ -1,8 +1,8 @@
 const express = require('express');
+const path = require('path');
 
 const authRouter = express.Router();
 const jsonParser = express.json();
-const path = require('path');
 
 const AuthService = require('./authService.js')
 
@@ -10,7 +10,39 @@ authRouter
   .post( '/login', jsonParser, (req, res, next) => {
     const { email, password } = req.body;
     const user = { email, password };
-    // FINISH THIS PART
+    let hashedPW;
+    
+    for( const [key,value] of Object.entries(user)){
+      if(value === null){
+        return res.status(400).json({
+          error: `Missing ${key} in request`
+        })
+      }
+    }
+
+    AuthService.getUserByEmail(req.app.get('db'),email)
+      .then( user => {
+        if(!user){
+          return res.status(400).json({
+            error: "Incorrect email and/or password"
+          })
+        }
+
+        AuthService.comparePasswords(password,user.password)
+          .then(passwordsMatch => {
+            if(!passwordsMatch){
+              return res.status(401).json({
+                error: "Incorrect email and/or password"
+              })
+            }
+            const subject = user.email;
+            const payload = { user_id: user.id }
+            res.send({
+              authToken: AuthService.createJwt(subject,payload)
+            })
+          })
+      })
+      .catch(next)
   });
 
 authRouter
@@ -44,13 +76,13 @@ authRouter
               email,
               password: hashedPassword
             }
-          })
-        return AuthService.insertUser(req.app.get('db'),newUser)
-          .then( user => {
-            res.
-              status(201)
-              .location(path.posix.join(req.originalUrl, `/${user.id}`))
-              .json(AuthService.serializeUser(user))
+            return AuthService.insertUser(req.app.get('db'),newUser)
+              .then( user => {
+                res.
+                  status(201)
+                  .location(path.posix.join(req.originalUrl, `/${user.id}`))
+                  .json(AuthService.serializeUser(user))
+              })
           })
       })
       .catch(next)
