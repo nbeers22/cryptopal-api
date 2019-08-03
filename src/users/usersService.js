@@ -7,11 +7,6 @@ const UsersService = {
       .where({ id })
       .first()
   },
-  getUserFavorites(db,id){
-    return db('cryptopal_users')
-      .where('id', id)
-      .first()
-  },
   addToUserFavorites(db,id,favorites){
     return db('cryptopal_users')
       .where('id', id)
