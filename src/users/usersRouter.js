@@ -9,20 +9,21 @@ const { requireAuth } = require('../middleware/jwt-auth.js')
 
 usersRouter
   .route('/:user_id/favorites')
-  .get( (req, res, next) => {
-    res.send('Hello')
-    // const { user_id } = req.params;
-
-    // UsersService.getUserByID(req.app.get('db', user_id))
-    //   .then( user => {
-    //     if(user){
-    //       res.status(200).json({
-    //         favorites: response.favorites
-    //       })
-    //     }else{
-    //       console.log('Error: User does not exist')
-    //     }
-    //   })
+  .get(requireAuth, (req, res, next) => {
+    const { user_id } = req.params;
+    
+    UsersService.getUserByID(req.app.get('db'), user_id)
+      .then( user => {
+        if(user){
+          res.status(200).json({
+            favorites: user.favorites
+          })
+        }else{
+          res.status(404).json({
+            error: `User with id: ${user_id} not found`
+          })
+        }
+      })
   })
 
 usersRouter
@@ -31,12 +32,10 @@ usersRouter
     const db = req.app.get('db');
     const { coinID } = req.body;
     const { user_id } = req;
-    console.log(res.headersSent) // FALSE
     
     // get current favorites for user to see if it already exists in db
-    UsersService.getUserFavorites(db, user_id)
+    UsersService.getUserByID(db, user_id)
       .then( response => {
-        console.log(res.headersSent) // TRUE
         let favExists = false;
         response.favorites.forEach( fav => {
           if(fav == coinID)
