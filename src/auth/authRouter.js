@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const gravatar = require('gravatar');
 
 const authRouter = express.Router();
 const jsonParser = express.json();
@@ -37,10 +38,13 @@ authRouter
             }
             const subject = user.email;
             const payload = { user_id: user.id }
+            const gravatarURL = gravatar.url(user.email);
+            
             res.send({
               authToken: AuthService.createJwt(subject,payload),
               user_id: user.id,
-              name: user.name
+              name: user.name,
+              gravatar: gravatarURL
             })
           })
       })
