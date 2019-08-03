@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const coinsRouter = require('./coins/coinsRouter.js');
 const authRouter = require('./auth/authRouter.js');
+const usersRouter = require('./users/usersRouter.js');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(express.json()); 
 app.use('/api/coins',coinsRouter);
 app.use('/api/auth',authRouter);
+app.use('/api/users',usersRouter);
 
 const errorHandler = (error,req,res,next) => {
   let response;
