@@ -12,7 +12,7 @@ coinsRouter
       uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
       qs: {
         'start': '1',
-        'limit': '3',
+        'limit': '100',
         'convert': 'USD'
       },
       headers: {
@@ -27,6 +27,30 @@ coinsRouter
     })
     .catch(next);
   });
+
+coinsRouter
+  .route('/dashboard')
+  .get( (req,res,next) => {
+    const requestOptions = {
+      method: 'GET',
+      uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
+      qs: {
+        'start': '1',
+        'limit': '4000',
+        'convert': 'USD'
+      },
+      headers: {
+        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
+      },
+      json: true,
+      gzip: true
+    };
+
+    rp(requestOptions).then(response => {
+      res.json(response)
+    })
+    .catch(next);
+  })
 
 coinsRouter
   .route('/:coin_id')
