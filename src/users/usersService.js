@@ -14,6 +14,13 @@ const UsersService = {
         favorites: db.raw('array_append(favorites, ?)', [favorites])
       })
   },
+  removeFromUserFavorites(db,id,favorite){
+    return db('cryptopal_users')
+      .where('id', id)
+      .update({
+        favorites: db.raw('array_remove(favorites, ?)', [favorite])
+      })
+  },
 }
 
 module.exports = UsersService;

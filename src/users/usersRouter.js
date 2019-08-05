@@ -52,6 +52,21 @@ usersRouter
             })
         }
       })
+  })
+  .put(requireAuth, jsonParser, (req,res,next) => {
+    const db = req.app.get('db');
+    const { coinID } = req.body;
+    const { user_id } = req;
+
+    if(!user_id || !coinID){
+      return res.status(401).json({ error: "Unauthorized request" })
+    }
+    
+    UsersService.removeFromUserFavorites(db, user_id, coinID)
+      .then( response => {
+        res.status(204).json({ response })
+      })
+      .catch( err => next(err))
   });
 
   module.exports = usersRouter;
