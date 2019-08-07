@@ -12,12 +12,14 @@ function requireAuth(req, res, next) {
 
   try {
     const payload = AuthService.verifyJwt(bearerToken);
-    if(payload.message.includes("expired")){
-      return res
-        .status(401)
-        .json({
-          error: 'Token Expired'
-        })
+    if(payload.message){
+      if(payload.message.includes("expired")){
+        return res
+          .status(401)
+          .json({
+            error: 'Token Expired'
+          })
+      }
     }
 
     AuthService.getUserByEmail(
