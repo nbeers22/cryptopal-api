@@ -12,9 +12,10 @@ authRouter
     const { email, password } = req.body;
     const user = { email, password };
     let hashedPW;
+    console.log(user)
     
     for( const [key,value] of Object.entries(user)){
-      if(value === null){
+      if(value == null){
         return res.status(400).json({
           error: `Missing ${key} in request`
         })
@@ -32,7 +33,7 @@ authRouter
         AuthService.comparePasswords(password,user.password)
           .then(passwordsMatch => {
             if(!passwordsMatch){
-              return res.status(401).json({
+              return res.status(400).json({
                 error: "Incorrect email and/or password"
               })
             }
@@ -55,16 +56,17 @@ authRouter
   .post( '/signup', jsonParser, (req, res, next) => {
     const { name, email, password } = req.body;
     const newUser = { name, email, password };
-
+    
     for(const field of ['name', 'email', 'password']){
       if(!req.body[field]){
-        res.status(400).json({
+        return res.status(400).json({
           error: `Missing ${field} in request body`
         });
       }
     }
 
     const passwordError = AuthService.validatePassword(password);
+    console.log("PW Error" + passwordError)
 
     if(passwordError){
       return res.status(400).json({ error: passwordError });
