@@ -77,7 +77,43 @@ describe('Auth Endpoints', () => {
     })
   })
   
-  
+  describe('POST /api/auth/signup', () => {
+    const requiredFields = ['email', 'password', 'name'];
+
+    requiredFields.forEach( field => {
+      const signupAttemptBody = {
+        email: testUser.email,
+        password: testUser.password,
+        name: testUser.name,
+      }
+
+      it(`responds with 400 required error when ${field} is missing`, () => {
+        delete signupAttemptBody[field]
+
+        return supertest(app)
+          .post("/api/auth/signup")
+          .send(signupAttemptBody)
+          .expect(400, {
+            error: `Missing ${field} in request body`
+          })
+      })
+    });
+
+    it('responds with 400 error when password is less than 6 characters', () => {
+      const signupAttemptBody = {
+        email: testUser.email,
+        password: "hello",
+        name: testUser.name,
+      }
+
+      return supertest(app)
+        .post('/api/auth/signup')
+        .send(signupAttemptBody)
+        .expect(400, {
+          error: "Password must be at least 6 characters"
+        })
+    })
+  })
   
 
 });
