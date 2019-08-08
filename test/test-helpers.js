@@ -7,7 +7,7 @@ function makeUsersArray() {
       email: 'user1@mail.com',
       name: 'TU1',
       password: 'password',
-      favorites: [1,2,22]
+      favorites: [1,2,22],
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
@@ -15,7 +15,7 @@ function makeUsersArray() {
       email: 'user2@mail.com',
       name: 'TU2',
       password: 'password',
-      favorites: [1,2,33]
+      favorites: [1,2,33],
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
@@ -23,7 +23,7 @@ function makeUsersArray() {
       email: 'user3@mail.com',
       name: 'TU3',
       password: 'password',
-      favorites: [1,2,44]
+      favorites: [1,2,44],
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
@@ -31,7 +31,7 @@ function makeUsersArray() {
       email: 'user4@mail.com',
       name: 'TU4',
       password: 'password',
-      favorites: [1,2,11]
+      favorites: [1,2,11],
       date_created: '2029-01-22T16:28:32.615Z',
     },
   ]
@@ -68,13 +68,13 @@ const createJwt = (subject, payload) => {
     expiresIn: process.env.JWT_EXPIRY,
     algorithm: 'HS256',
   })
-},
+}
 
 const verifyJwt = token => {
   return jwt.verify(token, process.env.JWT_SECRET, {algorithms: ['HS256']}, (err,decoded) => {
     return err ? err : decoded
   })
-},
+}
 
 module.exports = {
   makeUsersArray,
