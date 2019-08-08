@@ -5,7 +5,71 @@ const usersRouter = express.Router()
 const jsonParser = express.json()
 
 const UsersService = require('./usersService.js')
+const AuthService = require('../auth/authService.js')
 const { requireAuth } = require('../middleware/jwt-auth.js')
+
+usersRouter
+  .route('/:user_id')
+  .patch( requireAuth, jsonParser, (req,res,next) => {
+    const { user_id } = req.params;
+    const { name, newPassword, oldPassword } = req.body;
+    const userData = { name, newPassword }
+    
+    // Remove any keys that have undefined values
+    Object.keys(userData).forEach( key => {
+      !userData[key] && delete userData[key]
+    })
+    
+    if(userData.name){
+      UsersService.updateUserName(
+        req.app.get('db'),
+        user_id,
+        userData
+      )
+        .then( user => {
+          const { name } = user[0];
+          res.json({ name });
+          return;
+        })
+        .catch(next)
+    }
+
+    if(userData.newPassword){
+      UsersService.getUserByID(req.app.get('db'), user_id)
+      .then( user => {
+        if(user){
+          AuthService.comparePasswords(oldPassword,user.password)
+            .then( passwordsMatch => {
+              if(!passwordsMatch){
+                return res.json({
+                  error: "Old password does not match"
+                })
+              }else{
+                AuthService.hashPassword(userData.newPassword)
+                  .then( newHashedPW => {
+                    UsersService.updateUserPW(
+                      req.app.get('db'),
+                      user_id,
+                      { password: newHashedPW }
+                    )
+                      .then( response => {
+                        res.json({ ...response[0] })
+                        return;
+                      })
+                      .catch(next)
+                  })
+              }
+            })
+            .catch(next)
+        }else{
+          res.status(404).json({
+            error: `User with id: ${user_id} not found`
+          })
+        }
+      })
+      .catch(next)
+    }
+  })
 
 usersRouter
   .route('/:user_id/favorites')
