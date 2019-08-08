@@ -23,7 +23,9 @@ coinsRouter
     };
 
     rp(requestOptions).then(response => {
-      res.json(response)
+      res
+      .status(200)
+      .json(response)
     })
     .catch(next);
   });
