@@ -10,4 +10,4 @@ Start nodemon for the application `npm run dev`
 
 Run the tests `npm test`
 
-Run migrations `npm run migration`
+Run migrations `npm run migrate`
