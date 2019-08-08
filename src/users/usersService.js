@@ -21,6 +21,22 @@ const UsersService = {
         favorites: db.raw('array_remove(favorites, ?)', [favorite])
       })
   },
+  updateUserName(db, id, data){
+    return db('cryptopal_users')
+      .where('id', id)
+      .update({
+        name: data.name
+      })
+      .returning('*')
+  },
+  updateUserPW(db, id, data){
+    return db('cryptopal_users')
+      .where('id', id)
+      .update({
+        password: data.password
+      })
+      .returning('*')
+  }
 }
 
 module.exports = UsersService;
