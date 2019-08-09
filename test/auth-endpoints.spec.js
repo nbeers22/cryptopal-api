@@ -1,6 +1,8 @@
 const knex = require('knex')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
+const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
 
 describe('Auth Endpoints', () => {
   
@@ -23,7 +25,7 @@ describe('Auth Endpoints', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe('POST /api/auth/login', () => {
+  describe.only('POST /api/auth/login', () => {
     beforeEach('insert users', () => 
       helpers.seedUsers( db, testUsers)
     )
@@ -58,7 +60,7 @@ describe('Auth Endpoints', () => {
         .post("/api/auth/login")
         .send(fakeUser)
         .expect(400, {
-          error: `Incorrect email and/or password`
+          error: `No account found with that email`
         })
     })
     
@@ -73,6 +75,33 @@ describe('Auth Endpoints', () => {
         .send(userWithBadPassword)
         .expect(400, {
           error: `Incorrect email and/or password`
+        })
+    })
+
+    it(`responds 200 and JWT auth token using secret when valid credentials`, () => {
+      const userValidCreds = {
+        email: testUser.email,
+        password: testUser.password,
+      }
+      const expectedToken = jwt.sign(
+        { user_id: testUser.id },
+        process.env.JWT_SECRET,
+        {
+          subject: testUser.email,
+          expiresIn: '24h',
+          algorithm: 'HS256',
+        }
+      )
+      const gravatarURL = gravatar.url(testUser.email);
+
+      return supertest(app)
+        .post('/api/auth/login')
+        .send(userValidCreds)
+        .expect(200, {
+          authToken: expectedToken,
+          user_id: testUser.id,
+          name: testUser.name,
+          gravatar: gravatarURL
         })
     })
   })
