@@ -12,7 +12,6 @@ authRouter
     const { email, password } = req.body;
     const user = { email, password };
     let hashedPW;
-    console.log(user)
     
     for( const [key,value] of Object.entries(user)){
       if(value == null){
@@ -22,11 +21,11 @@ authRouter
       }
     }
 
-    AuthService.getUserByEmail(req.app.get('db'),email)
+    AuthService.getUserByEmail(req.app.get('db'),user.email)
       .then( user => {
         if(!user){
           return res.status(400).json({
-            error: "Incorrect email and/or password"
+            error: "No account found with that email"
           })
         }
 
@@ -66,7 +65,6 @@ authRouter
     }
 
     const passwordError = AuthService.validatePassword(password);
-    console.log("PW Error" + passwordError)
 
     if(passwordError){
       return res.status(400).json({ error: passwordError });
