@@ -108,7 +108,7 @@ describe('Auth Endpoints', () => {
     })
   })
   
-  describe.only('POST /api/auth/signup', () => {
+  describe('POST /api/auth/signup', () => {
     const requiredFields = ['email', 'password', 'name'];
 
     requiredFields.forEach( field => {
