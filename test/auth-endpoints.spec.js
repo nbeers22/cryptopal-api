@@ -25,7 +25,7 @@ describe('Auth Endpoints', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe.only('POST /api/auth/login', () => {
+  describe('POST /api/auth/login', () => {
     beforeEach('insert users', () => 
       helpers.seedUsers( db, testUsers)
     )
@@ -106,7 +106,7 @@ describe('Auth Endpoints', () => {
     })
   })
   
-  describe('POST /api/auth/signup', () => {
+  describe.only('POST /api/auth/signup', () => {
     const requiredFields = ['email', 'password', 'name'];
 
     requiredFields.forEach( field => {
@@ -140,6 +140,23 @@ describe('Auth Endpoints', () => {
         .send(signupAttemptBody)
         .expect(400, {
           error: "Password must be at least 6 characters"
+        })
+    });
+
+    it('responds with 400 error when email is not unique', () => {
+      helpers.seedUsers( db, testUsers)
+
+      const signupAttemptBody = {
+        email: testUser.email,
+        password: testUser.password,
+        name: testUser.name,
+      }
+
+      return supertest(app)
+        .post('/api/auth/signup')
+        .send(signupAttemptBody)
+        .expect(400, {
+          error: "Email already taken"
         })
     })
   })
