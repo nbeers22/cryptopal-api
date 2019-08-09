@@ -5,15 +5,16 @@ const coinsRouter = express.Router()
 const jsonParser = express.json()
 
 coinsRouter
-  .route('/')
-  .get( (req, res, next) => {
+  .get( '/', (req, res, next) => {
+    const { start, limit, convert } = req.body;
+    console.log("Hello")
     const requestOptions = {
       method: 'GET',
       uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
       qs: {
-        'start': '1',
-        'limit': '100',
-        'convert': 'USD'
+        'start': start || '1',
+        'limit': limit || '100',
+        'convert': convert || 'USD'
       },
       headers: {
         'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
@@ -57,12 +58,12 @@ coinsRouter
 coinsRouter
   .route('/:coin_id')
   .get( (req,res,next) => {
-    const coinID = req.params.coin_id;
+    const { coin_id } = req.params;
     const requestOptions = {
       method: 'GET',
       uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/info',
       qs: {
-        'id': coinID
+        'id': coin_id
       },
       headers: {
         'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
