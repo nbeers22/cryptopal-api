@@ -1,4 +1,6 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 function makeUsersArray() {
   return [
@@ -51,21 +53,20 @@ function seedUsers(db,users){
       ...user,
       password: bcrypt.hashSync(user.password, 1)
     }
+  })
   return db.into('cryptopal_users').insert(preppedUsers)
     .then( () =>
       // update auto-sequence to stay in sync
       db.raw(
-        `SELECT setval('cryptopal_users_seq', ?)`,
+        `SELECT setval('cryptopal_users_id_seq', ?)`,
         [users[users.length - 1].id]
       )
     )
-  })
 }
 
 const createJwt = (subject, payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
     subject,
-    expiresIn: process.env.JWT_EXPIRY,
     algorithm: 'HS256',
   })
 }
