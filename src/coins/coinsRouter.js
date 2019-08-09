@@ -1,3 +1,4 @@
+
 const express = require('express');
 const rp = require('request-promise');
 
@@ -17,7 +18,7 @@ coinsRouter
         'convert': convert || 'USD'
       },
       headers: {
-        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
+        'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
       },
       json: true,
       gzip: true
@@ -43,7 +44,7 @@ coinsRouter
         'convert': 'USD'
       },
       headers: {
-        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
+        'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
       },
       json: true,
       gzip: true
@@ -66,7 +67,7 @@ coinsRouter
         'id': coin_id
       },
       headers: {
-        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
+        'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
       },
       json: true,
       gzip: true
@@ -89,7 +90,7 @@ coinsRouter
         'id': coinID
       },
       headers: {
-        'X-CMC_PRO_API_KEY': 'fe600837-03f2-4c7d-8ab9-374c7b5ea09c'
+        'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY
       },
       json: true,
       gzip: true
