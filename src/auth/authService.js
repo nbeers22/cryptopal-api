@@ -40,7 +40,7 @@ const AuthService = {
       id: user.id,
       name: xss(user.name),
       email: xss(user.email),
-      date_created: new Date(user.date_created),
+      date_created: Date.now(),
     }
   },
   getUserByEmail(db,email){
