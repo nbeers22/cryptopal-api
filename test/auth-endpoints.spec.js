@@ -3,6 +3,8 @@ const app = require('../src/app')
 const helpers = require('./test-helpers')
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
+const xss = require('xss');
 
 describe('Auth Endpoints', () => {
   
@@ -158,6 +160,64 @@ describe('Auth Endpoints', () => {
         .expect(400, {
           error: "Email already taken"
         })
+    })
+
+    context('Successful sign up', () => {
+      it('responds with 201 created when all validations pass', () => {
+        const signupAttemptBody = {
+          email: testUser.email,
+          password: testUser.password,
+          name: testUser.name,
+        }
+  
+        return supertest(app)
+          .post('/api/auth/signup')
+          .send(signupAttemptBody)
+          .expect(201)
+          .expect( res => {
+            expect(res.body.id).to.eql(testUser.id)
+            expect(res.body.email).to.eql(testUser.email)
+            expect(res.body.name).to.eql(testUser.name)
+            expect(res.body).to.not.have.property('password')
+            expect(res.headers.location).to.eql(`/api/auth/signup/${res.body.id}`)
+            const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
+            const actualDate = new Date(res.body.date_created).toLocaleString()
+            expect(actualDate).to.eql(expectedDate)
+          })
+      })
+      
+      it('Properly inserts new user into database', () => {
+        const signupAttemptBody = {
+          email: testUser.email,
+          password: testUser.password,
+          name: testUser.name,
+        }
+  
+        return supertest(app)
+          .post('/api/auth/signup')
+          .send(signupAttemptBody)
+          .expect(201)
+          .expect(res =>
+            db 
+              .from('cryptopal_users')
+              .select('*')
+              .where({ id: res.body.id })
+              .first()
+              .then( row => {
+                expect(row.email).to.eql(testUser.email)
+                expect(row.id).to.eql(testUser.id)
+                expect(row.name).to.eql(testUser.name)
+                const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
+                const actualDate = new Date(row.date_created).toLocaleString()
+                // expect(actualDate).to.eql(expectedDate)
+
+                return bcrypt.compare(testUser.password, row.password)
+              })
+              .then( passwordsMatch => {
+                expect(passwordsMatch).to.be.true
+              })
+          )
+      })
     })
   })
   
