@@ -8,7 +8,6 @@ const jsonParser = express.json()
 coinsRouter
   .get( '/', (req, res, next) => {
     const { start, limit, convert } = req.body;
-    console.log("Hello")
     const requestOptions = {
       method: 'GET',
       uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
@@ -105,17 +104,16 @@ coinsRouter
 coinsRouter
   .route('/:coin_slug/history/:days')
   .get( (req,res,next) => {
-    const slug = req.params.coin_slug;
-    const {days} = req.params
+    const { days, coin_slug } = req.params
     const requestOptions = {
       method: 'GET',
-      uri: `https://api.coingecko.com/api/v3/coins/${slug}/market_chart`,
+      uri: `https://api.coingecko.com/api/v3/coins/${coin_slug}/market_chart`,
       qs: {
         'vs_currency': 'usd',
         'days': days || 30
       },
       headers: {
-        'Apikey': '0ae8b16fe3fc03c68ed8452fd65370405e9600cd423f48749fef152f46655816'
+        'Apikey': process.env.COINGECKO_API_KEY
       },
       json: true,
       gzip: true
