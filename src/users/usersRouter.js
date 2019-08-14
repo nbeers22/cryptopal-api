@@ -28,7 +28,7 @@ usersRouter
       )
         .then( user => {
           const { name } = user[0];
-          res.json({ name });
+          res.status(200).json({ name });
           return;
         })
         .catch(next)
@@ -53,7 +53,7 @@ usersRouter
                       { password: newHashedPW }
                     )
                       .then( response => {
-                        res.json({ ...response[0] })
+                        res.status(200).json({ ...response[0] })
                         return;
                       })
                       .catch(next)
@@ -93,6 +93,9 @@ usersRouter
 usersRouter
   .route('/favorites')
   .patch(requireAuth, jsonParser, (req,res,next) => {
+    console.log("############")
+    console.log("############")
+    console.log("############")
     const db = req.app.get('db');
     const { coinID } = req.body;
     const { user_id } = req;
@@ -100,6 +103,7 @@ usersRouter
     // get current favorites for user to see if it already exists in db
     UsersService.getUserByID(db, user_id)
       .then( response => {
+        console.log(response)
         let favExists = false;
         if(response.favorites){
           response.favorites.forEach( fav => {
