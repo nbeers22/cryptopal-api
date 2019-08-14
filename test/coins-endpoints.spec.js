@@ -1,7 +1,7 @@
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
-describe.only('Coins Endpoints', () => {
+describe('Coins Endpoints', () => {
 
   describe('GET /api/coins', () => {
     it("should respond with JSON data of latest coins with body params sent", () => {
@@ -75,7 +75,7 @@ describe.only('Coins Endpoints', () => {
     })
   })
   
-  describe.only('GET /api/coins/:coin_slug/history/:days', () => {
+  describe('GET /api/coins/:coin_slug/history/:days', () => {
     it("should respond with JSON data of specified coin id", () => {
       const coinSlug = "bitcoin"
       const days = 100;
