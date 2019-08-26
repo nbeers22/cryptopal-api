@@ -135,20 +135,20 @@ describe.only('User Endpoints', () => {
     });
   });
   
-  describe.only('PATCH /api/users/favorites', () => {
+  describe.only('POST /api/users/favorites', () => {
 
     beforeEach('insert users', () => { 
       helpers.seedUsers( db, testUsers);
     });
 
-    it('responds with 401 if coin id is already found in favorites', (done) => {
+    it('responds with 401 if coin id is already found in favorites', async() => {
       const authToken = helpers.createJwt( testUser.email, { user_id: testUser.id } );
       const userFavBody = {
         coinID: testUser.favorites[0]
       }
 
       return supertest(app)
-        .patch('/api/users/favorites')
+        .post('/api/users/favorites')
         .send(userFavBody)
         .set({"Authorization": `Bearer ${authToken}`})
         .expect(401,{
@@ -156,14 +156,14 @@ describe.only('User Endpoints', () => {
         })
     });
     
-    it('responds with 204 if coin id is successfully added to favorites', () => {
+    it('responds with 204 if coin id is successfully added to favorites', async() => {
       const authToken = helpers.createJwt( testUser.email, { user_id: testUser.id } );
       const userFavBody = {
         coinID: 9999
       }
 
       return supertest(app)
-        .patch('/api/users/favorites')
+        .post('/api/users/favorites')
         .send(userFavBody)
         .set({"Authorization": `Bearer ${authToken}`})
         .expect(204);
