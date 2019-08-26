@@ -92,10 +92,7 @@ usersRouter
 
 usersRouter
   .route('/favorites')
-  .patch(requireAuth, jsonParser, (req,res,next) => {
-    console.log("############")
-    console.log("############")
-    console.log("############")
+  .post(requireAuth, jsonParser, (req,res,next) => {
     const db = req.app.get('db');
     const { coinID } = req.body;
     const { user_id } = req;
@@ -103,7 +100,6 @@ usersRouter
     // get current favorites for user to see if it already exists in db
     UsersService.getUserByID(db, user_id)
       .then( response => {
-        console.log(response)
         let favExists = false;
         if(response.favorites){
           response.favorites.forEach( fav => {
